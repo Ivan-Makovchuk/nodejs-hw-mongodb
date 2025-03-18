@@ -1,12 +1,22 @@
+console.log('Loaded ENV variables:', process.env.MONGODB_USER, process.env.MONGODB_URL);
 import mongoose from 'mongoose';
-import { getEnvVar } from '../utils/getEnvVar.js';
 
-export function initMongoConnection() {
-  const MONGODB_USER = getEnvVar('MONGODB_USER');
-  const MONGODB_PASSWORD = getEnvVar('MONGODB_PASSWORD');
-  const MONGODB_URL = getEnvVar('MONGODB_URL');
-  const MONGODB_DB = getEnvVar('MONGODB_DB');
-  return mongoose.connect(
-    `mongodb+srv://${MONGODB_USER}:${MONGODB_PASSWORD}@${MONGODB_URL}/${MONGODB_DB}?retryWrites=true&w=majority&appName=University`,
-  );
+export async function initMongoConnection() {
+  try {
+    const { MONGODB_USER, MONGODB_PASSWORD, MONGODB_URL, MONGODB_DB } = process.env;
+    
+    if (!MONGODB_USER || !MONGODB_PASSWORD || !MONGODB_URL || !MONGODB_DB) {
+      throw new Error('Missing required MongoDB environment variables');
+    }
+
+    const uri = `mongodb+srv://${encodeURIComponent(MONGODB_USER)}:${encodeURIComponent(MONGODB_PASSWORD)}@${MONGODB_URL}/${MONGODB_DB}?retryWrites=true&w=majority`;
+    
+    console.log('Connecting to MongoDB with URI:', uri.replace(/:[^:@]+@/, ':******@')); // Логируем без пароля
+
+    await mongoose.connect(uri);
+    console.log('Mongo connection successfully established!');
+  } catch (error) {
+    console.error('MongoDB connection error:', error.message);
+    process.exit(1); // Завершаем процесс при ошибке подключения
+  }
 }
