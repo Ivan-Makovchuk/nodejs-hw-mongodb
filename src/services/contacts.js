@@ -1,31 +1,57 @@
-import { Contact } from '../models/contact.js';
+import { SORT_ORDER } from '../constants/index.js';
+import Contacts from '../models/contacts.js';
+import { calculatePaginationData } from '../utils/calculatePaginationData.js';
 
-export async function getAllContacts(req, res) {
-  try {
-    const contacts = await Contact.find();
-    res.status(200).json({
-      status: 200,
-      message: 'Successfully found contacts!',
-      data: contacts,
-    });
-  } catch (error) {
-    res.status(500).json({ message: 'Internal server error', error });
+export async function getAllContacts({
+  page,
+  perPage,
+  sortBy = 'name',
+  sortOrder = SORT_ORDER.ASC,
+  filter = {},
+}) {
+  const limit = perPage;
+  const skip = (page - 1) * perPage;
+
+  const contactsQuery = Contacts.find();
+
+  if (filter.type) {
+    contactsQuery.where('contactType').equals(filter.type);
   }
+  if (typeof filter.isFavourite !== 'undefined') {
+    contactsQuery.where('isFavourite').equals(filter.isFavourite);
+  }
+
+  const [contactsCount, contacts] = await Promise.all([
+    Contacts.find().merge(contactsQuery).countDocuments(),
+    contactsQuery
+      .skip(skip)
+      .limit(limit)
+      .sort({ [sortBy]: sortOrder })
+      .exec(),
+  ]);
+
+  const paginationData = calculatePaginationData(contactsCount, perPage, page);
+
+  return {
+    data: contacts,
+    ...paginationData,
+  };
 }
 
-export async function getContactById(req, res) {
-  try {
-    const { contactId } = req.params;
-    const contact = await Contact.findById(contactId);
-    if (!contact) {
-      return res.status(404).json({ message: 'Contact not found' });
-    }
-    res.status(200).json({
-      status: 200,
-      message: `Successfully found contact with id ${contactId}!`,
-      data: contact,
-    });
-  } catch (error) {
-    res.status(500).json({ message: 'Internal server error', error });
-  }
+export async function getContactById(id) {
+  const contact = await Contacts.findById(id);
+  return contact;
+}
+
+export async function createContact(payload) {
+  const contact = await Contacts.create(payload);
+  return contact;
+}
+
+export async function updateContact(contactId, contact) {
+  return await Contacts.findByIdAndUpdate(contactId, contact, { new: true });
+}
+
+export async function deleteContact(contactId) {
+  return await Contacts.findByIdAndDelete(contactId);
 }
