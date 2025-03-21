@@ -22,13 +22,10 @@ export const setupServer = async () => {
     }),
   );
 
-  app.get('/', (req, res) => {
-    res.json({ message: "API is working!" });
-  });
-
-  app.use('/contacts', contactsRouter);
+  app.use(contactsRouter);
 
   app.use(notFoundHandler);
+
   app.use(errorHandler);
 
   app.listen(PORT, () => {
