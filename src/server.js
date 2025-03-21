@@ -1,4 +1,4 @@
-import express from 'express';
+import * as express from 'express';
 import { getEnvVar } from './utils/getEnvVar.js';
 import pino from 'pino-http';
 import cors from 'cors';
@@ -21,8 +21,12 @@ export const setupServer = async () => {
       },
     }),
   );
+  app.get('/', (req, res) => {
+    res.json({ message: "API is working!" });
+  });
+  
 
-  app.use(contactsRouter);
+  app.use('/contacts', contactsRouter);
 
   app.use(notFoundHandler);
 
