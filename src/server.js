@@ -1,4 +1,4 @@
-import * as express from 'express';
+import express from 'express';
 import { getEnvVar } from './utils/getEnvVar.js';
 import pino from 'pino-http';
 import cors from 'cors';
