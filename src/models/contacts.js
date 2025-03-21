@@ -26,7 +26,10 @@ const contactsSchema = new mongoose.Schema(
       default: 'personal',
     },
   },
-  { timestamps: true },
+  {
+    timestamps: true,
+    versionKey: false,
+  },
 );
 
 const Contacts = mongoose.model('Contacts', contactsSchema);
