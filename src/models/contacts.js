@@ -25,15 +25,8 @@ const contactsSchema = new mongoose.Schema(
       required: true,
       default: 'personal',
     },
-    userId: {
-      type: mongoose.Schema.Types.ObjectId,
-      required: true,
-    },
   },
-  {
-    timestamps: true,
-    versionKey: false,
-  },
+  { timestamps: true },
 );
 
 const Contacts = mongoose.model('Contacts', contactsSchema);
