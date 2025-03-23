@@ -5,7 +5,7 @@ const bootstrap = async () => {
   try {
     await initMongoConnection();
     console.log('Mongo connection successfully established!');
-    await setupServer();
+    setupServer();
   } catch (error) {
     console.error('Error connecting to MongoDB:', error);
   }
