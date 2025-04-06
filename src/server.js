@@ -6,6 +6,7 @@ import cookieParser from 'cookie-parser';
 import { notFoundHandler } from './middlewares/notFoundHandler.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import router from './routers/index.js';
+import { UPLOAD_DIR } from './constants/index.js';
 
 const PORT = Number(getEnvVar('PORT', '3000'));
 
@@ -14,6 +15,7 @@ export const setupServer = async () => {
   app.use(cookieParser());
 
   app.use(express.json());
+
   app.use(cors());
 
   app.use(
@@ -23,6 +25,8 @@ export const setupServer = async () => {
       },
     }),
   );
+
+  app.use('/uploads', express.static(UPLOAD_DIR));
 
   app.use(router);
 
